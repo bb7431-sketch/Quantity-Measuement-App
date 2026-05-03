@@ -5,40 +5,70 @@ import static org.junit.jupiter.api.Assertions.*;
 
 public class QuantityMeasurementAppTest {
 
+    // --- Feet Equality Tests ---
+
     @Test
-    void testEquality_SameValue() {
-        // Verifies that two numerical values of 1.0 ft are considered equal.
-        QuantityMeasurementApp.Feet feet1 = new QuantityMeasurementApp.Feet(1.0);
-        QuantityMeasurementApp.Feet feet2 = new QuantityMeasurementApp.Feet(1.0);
-        assertTrue(feet1.equals(feet2), "1.0 ft should be equal to 1.0 ft");
+    void testFeetEquality_SameValue() {
+        assertTrue(QuantityMeasurementApp.compareFeet(1.0, 1.0));
     }
 
     @Test
-    void testEquality_DifferentValue() {
-        // Verifies that two numerical values of 1.0 ft and 2.0 ft are not equal.
-        QuantityMeasurementApp.Feet feet1 = new QuantityMeasurementApp.Feet(1.0);
-        QuantityMeasurementApp.Feet feet2 = new QuantityMeasurementApp.Feet(2.0);
-        assertFalse(feet1.equals(feet2), "1.0 ft should not be equal to 2.0 ft");
+    void testFeetEquality_DifferentValue() {
+        assertFalse(QuantityMeasurementApp.compareFeet(1.0, 2.0));
     }
 
     @Test
-    void testEquality_NullComparison() {
+    void testFeetEquality_NullComparison() {
+        QuantityMeasurementApp.Feet feet = new QuantityMeasurementApp.Feet(1.0);
+        assertFalse(feet.equals(null));
+    }
+
+    @Test
+    void testFeetEquality_SameReference() {
+        QuantityMeasurementApp.Feet feet = new QuantityMeasurementApp.Feet(1.0);
+        assertTrue(feet.equals(feet));
+    }
+
+    // --- Inches Equality Tests (UC2) ---
+
+    @Test
+    void testInchesEquality_SameValue() {
+        // Verifies that two numerical values of 1.0 inch are considered equal.
+        assertTrue(QuantityMeasurementApp.compareInches(1.0, 1.0));
+    }
+
+    @Test
+    void testInchesEquality_DifferentValue() {
+        // Verifies that two numerical values of 1.0 inch and 2.0 inches are not equal.
+        assertFalse(QuantityMeasurementApp.compareInches(1.0, 2.0));
+    }
+
+    @Test
+    void testInchesEquality_NullComparison() {
         // Verifies that a numerical value is not equal to null.
-        QuantityMeasurementApp.Feet feet = new QuantityMeasurementApp.Feet(1.0);
-        assertFalse(feet.equals(null), "1.0 ft should not be equal to null");
+        QuantityMeasurementApp.Inches inches = new QuantityMeasurementApp.Inches(1.0);
+        assertFalse(inches.equals(null));
     }
 
     @Test
-    void testEquality_NonNumericInput() {
-        // Verifies that non-numeric inputs are handled appropriately.
-        QuantityMeasurementApp.Feet feet = new QuantityMeasurementApp.Feet(1.0);
-        assertFalse(feet.equals(new Object()), "1.0 ft should not be equal to an Object of different type");
+    void testInchesEquality_NonNumericInput() {
+        // Verifies that type safety prevents equality with different objects.
+        QuantityMeasurementApp.Inches inches = new QuantityMeasurementApp.Inches(1.0);
+        assertFalse(inches.equals(new Object()));
     }
 
     @Test
-    void testEquality_SameReference() {
-        // Verifies that a numerical value is equal to itself (reflexive property).
+    void testInchesEquality_SameReference() {
+        // Verifies the reflexive property for Inches.
+        QuantityMeasurementApp.Inches inches = new QuantityMeasurementApp.Inches(1.0);
+        assertTrue(inches.equals(inches));
+    }
+
+    @Test
+    void testInchesAndFeetEquality_ShouldBeFalse() {
+        // UC2 mentions they are treated separately.
         QuantityMeasurementApp.Feet feet = new QuantityMeasurementApp.Feet(1.0);
-        assertTrue(feet.equals(feet), "1.0 ft should be equal to itself");
+        QuantityMeasurementApp.Inches inches = new QuantityMeasurementApp.Inches(1.0);
+        assertFalse(feet.equals(inches));
     }
 }

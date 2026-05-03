@@ -11,32 +11,46 @@ public class QuantityMeasurementApp {
 
         @Override
         public boolean equals(Object obj) {
-            // Step 5: Equals Method Implementation
-            // Check if the object is the same reference
-            if (this == obj) {
-                return true;
-            }
-            // Check if the object is null or a different type
-            if (obj == null || getClass() != obj.getClass()) {
-                return false;
-            }
-            // Cast to Feet type safely
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
             Feet feet = (Feet) obj;
-            // Compare double values using Double.compare() instead of == operator
             return Double.compare(feet.value, value) == 0;
         }
     }
 
+    public static class Inches {
+        private final double value;
+
+        public Inches(double value) {
+            this.value = value;
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) return true;
+            if (obj == null || getClass() != obj.getClass()) return false;
+            Inches inches = (Inches) obj;
+            return Double.compare(inches.value, value) == 0;
+        }
+    }
+
+    public static boolean compareFeet(double v1, double v2) {
+        Feet f1 = new Feet(v1);
+        Feet f2 = new Feet(v2);
+        return f1.equals(f2);
+    }
+
+    public static boolean compareInches(double v1, double v2) {
+        Inches i1 = new Inches(v1);
+        Inches i2 = new Inches(v2);
+        return i1.equals(i2);
+    }
+
     public static void main(String[] args) {
-        // Instantiate two Feet objects with test values
-        Feet feet1 = new Feet(1.0);
-        Feet feet2 = new Feet(1.0);
+        System.out.println("Input: 1.0 inch and 1.0 inch");
+        System.out.println("Output: Equal (" + compareInches(1.0, 1.0) + ")");
 
-        // Use the equals() method to compare them
-        boolean result = feet1.equals(feet2);
-
-        // Print the result to verify equality check
         System.out.println("Input: 1.0 ft and 1.0 ft");
-        System.out.println("Output: Equal (" + result + ")");
+        System.out.println("Output: Equal (" + compareFeet(1.0, 1.0) + ")");
     }
 }
