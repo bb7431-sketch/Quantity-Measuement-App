@@ -3,7 +3,7 @@ package com.quantitymeasurement;
 import java.util.Objects;
 
 /**
- * QuantityMeasurementApp provides a standard interface for length comparison and conversion.
+ * QuantityMeasurementApp provides a standard interface for length comparison, conversion, and addition.
  * It uses a centralized LengthUnit enum to handle conversion factors relative to a base unit (INCH).
  */
 public class QuantityMeasurementApp {
@@ -63,13 +63,35 @@ public class QuantityMeasurementApp {
             return (value * source.conversionFactor) / target.conversionFactor;
         }
 
+        /**
+         * Adds another measurement to this one and returns the result in this unit.
+         */
+        public QuantityLength add(QuantityLength other) {
+            Objects.requireNonNull(other, "Operand cannot be null");
+            double sumInBase = (this.value * this.unit.conversionFactor) + (other.value * other.unit.conversionFactor);
+            double finalValue = sumInBase / this.unit.conversionFactor;
+            return new QuantityLength(finalValue, this.unit);
+        }
+
+        /**
+         * Static method to add two measurements and express the result in a target unit.
+         */
+        public static QuantityLength add(QuantityLength q1, QuantityLength q2, LengthUnit targetUnit) {
+            Objects.requireNonNull(q1, "First operand cannot be null");
+            Objects.requireNonNull(q2, "Second operand cannot be null");
+            Objects.requireNonNull(targetUnit, "Target unit cannot be null");
+            
+            double sumInBase = (q1.value * q1.unit.conversionFactor) + (q2.value * q2.unit.conversionFactor);
+            double finalValue = sumInBase / targetUnit.conversionFactor;
+            return new QuantityLength(finalValue, targetUnit);
+        }
+
         @Override
         public boolean equals(Object obj) {
             if (this == obj) return true;
             if (obj == null || getClass() != obj.getClass()) return false;
             QuantityLength that = (QuantityLength) obj;
             
-            // Rounding to two decimal places for consistency as per UC5 hints
             double v1 = Math.round(this.value * this.unit.conversionFactor * 100.0) / 100.0;
             double v2 = Math.round(that.value * that.unit.conversionFactor * 100.0) / 100.0;
             
@@ -90,36 +112,28 @@ public class QuantityMeasurementApp {
         public LengthUnit getUnit() { return unit; }
     }
 
-    // --- API Demonstration Methods (Overloading) ---
+    // --- API Demonstration Methods ---
 
-    public static void demonstrateLengthConversion(double value, LengthUnit from, LengthUnit to) {
-        double result = QuantityLength.convert(value, from, to);
-        System.out.printf("Input: convert(%.2f, %s, %s) -> Output: %.4f\n", value, from, to, result);
+    public static void demonstrateLengthAddition(QuantityLength q1, QuantityLength q2) {
+        QuantityLength result = q1.add(q2);
+        System.out.printf("Addition: %s + %s -> Result: %s\n", q1, q2, result);
     }
 
-    public static void demonstrateLengthConversion(QuantityLength length, LengthUnit to) {
-        QuantityLength result = length.convertTo(to);
-        System.out.printf("Input: %s converted to %s -> Output: %s\n", length, to, result);
-    }
-
-    public static void demonstrateLengthEquality(QuantityLength l1, QuantityLength l2) {
-        boolean result = l1.equals(l2);
-        System.out.printf("Comparison: %s and %s -> Equal (%b)\n", l1, l2, result);
+    public static void demonstrateLengthAddition(QuantityLength q1, QuantityLength q2, LengthUnit target) {
+        QuantityLength result = QuantityLength.add(q1, q2, target);
+        System.out.printf("Addition: %s + %s (Target %s) -> Result: %s\n", q1, q2, target, result);
     }
 
     public static void main(String[] args) {
-        // Basic Conversions
-        demonstrateLengthConversion(1.0, LengthUnit.FEET, LengthUnit.INCH);
-        demonstrateLengthConversion(3.0, LengthUnit.YARD, LengthUnit.FEET);
-        demonstrateLengthConversion(36.0, LengthUnit.INCH, LengthUnit.YARD);
-        demonstrateLengthConversion(1.0, LengthUnit.CM, LengthUnit.INCH);
-        demonstrateLengthConversion(0.0, LengthUnit.FEET, LengthUnit.INCH);
+        // Same Unit Addition
+        demonstrateLengthAddition(new QuantityLength(1.0, LengthUnit.FEET), new QuantityLength(2.0, LengthUnit.FEET));
 
-        // Instance Method Conversion
-        QuantityLength myLength = new QuantityLength(1.0, LengthUnit.YARD);
-        demonstrateLengthConversion(myLength, LengthUnit.INCH);
-
-        // Equality checks
-        demonstrateLengthEquality(new QuantityLength(1.0, LengthUnit.FEET), new QuantityLength(12.0, LengthUnit.INCH));
+        // Cross Unit Addition
+        demonstrateLengthAddition(new QuantityLength(1.0, LengthUnit.FEET), new QuantityLength(12.0, LengthUnit.INCH));
+        demonstrateLengthAddition(new QuantityLength(12.0, LengthUnit.INCH), new QuantityLength(1.0, LengthUnit.FEET));
+        
+        // Yard and CM Addition
+        demonstrateLengthAddition(new QuantityLength(1.0, LengthUnit.YARD), new QuantityLength(3.0, LengthUnit.FEET));
+        demonstrateLengthAddition(new QuantityLength(2.54, LengthUnit.CM), new QuantityLength(1.0, LengthUnit.INCH));
     }
 }
