@@ -4,9 +4,9 @@ import java.util.Objects;
 
 public class QuantityMeasurementApp {
 
-    // Step 1: LengthUnit Enum with conversion factors relative to a base unit (INCH)
+    // Step 1: Updated LengthUnit Enum with YARDS and CENTIMETERS
     public enum LengthUnit {
-        FEET(12.0), INCH(1.0);
+        YARD(36.0), FEET(12.0), INCH(1.0), CM(0.393701);
 
         public final double conversionFactor;
 
@@ -15,7 +15,7 @@ public class QuantityMeasurementApp {
         }
     }
 
-    // Step 2: Generic QuantityLength Class
+    // Step 2: Generic QuantityLength Class (remains unchanged from UC3)
     public static class QuantityLength {
         private final double value;
         private final LengthUnit unit;
@@ -31,14 +31,15 @@ public class QuantityMeasurementApp {
             if (obj == null || getClass() != obj.getClass()) return false;
             QuantityLength that = (QuantityLength) obj;
             
-            // Handle null unit case
             if (this.unit == null || that.unit == null) return false;
 
-            // Convert both to base unit (Inches) for comparison
+            // Convert to base unit (Inches)
             double value1 = this.value * this.unit.conversionFactor;
             double value2 = that.value * that.unit.conversionFactor;
             
-            return Double.compare(value1, value2) == 0;
+            // Use a small delta for floating point comparison if necessary, 
+            // but for these factors Double.compare is usually sufficient.
+            return Math.abs(value1 - value2) < 0.0001;
         }
 
         @Override
@@ -49,25 +50,21 @@ public class QuantityMeasurementApp {
 
     // Backward Compatibility Helpers
     public static boolean compareFeet(double v1, double v2) {
-        QuantityLength q1 = new QuantityLength(v1, LengthUnit.FEET);
-        QuantityLength q2 = new QuantityLength(v2, LengthUnit.FEET);
-        return q1.equals(q2);
+        return new QuantityLength(v1, LengthUnit.FEET).equals(new QuantityLength(v2, LengthUnit.FEET));
     }
 
     public static boolean compareInches(double v1, double v2) {
-        QuantityLength q1 = new QuantityLength(v1, LengthUnit.INCH);
-        QuantityLength q2 = new QuantityLength(v2, LengthUnit.INCH);
-        return q1.equals(q2);
+        return new QuantityLength(v1, LengthUnit.INCH).equals(new QuantityLength(v2, LengthUnit.INCH));
     }
 
     public static void main(String[] args) {
-        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
-        QuantityLength inches12 = new QuantityLength(12.0, LengthUnit.INCH);
+        System.out.println("Input: Quantity(1.0, YARD) and Quantity(3.0, FEET)");
+        System.out.println("Output: Equal (" + new QuantityLength(1.0, LengthUnit.YARD).equals(new QuantityLength(3.0, LengthUnit.FEET)) + ")");
 
-        System.out.println("Input: Quantity(1.0, FEET) and Quantity(12.0, INCH)");
-        System.out.println("Output: Equal (" + feet1.equals(inches12) + ")");
+        System.out.println("Input: Quantity(1.0, YARD) and Quantity(36.0, INCH)");
+        System.out.println("Output: Equal (" + new QuantityLength(1.0, LengthUnit.YARD).equals(new QuantityLength(36.0, LengthUnit.INCH)) + ")");
 
-        System.out.println("Input: Quantity(1.0, INCH) and Quantity(1.0, INCH)");
-        System.out.println("Output: Equal (" + compareInches(1.0, 1.0) + ")");
+        System.out.println("Input: Quantity(1.0, CM) and Quantity(0.393701, INCH)");
+        System.out.println("Output: Equal (" + new QuantityLength(1.0, LengthUnit.CM).equals(new QuantityLength(0.393701, LengthUnit.INCH)) + ")");
     }
 }
