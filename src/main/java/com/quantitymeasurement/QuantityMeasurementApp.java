@@ -52,31 +52,32 @@ public class QuantityMeasurementApp {
         }
 
         /**
-         * Static utility method for raw numeric conversion.
+         * Adds another measurement to this one and returns the result in this instance's unit.
+         * (UC6 Implementation)
          */
-        public static double convert(double value, LengthUnit source, LengthUnit target) {
-            Objects.requireNonNull(source, "Source unit cannot be null");
-            Objects.requireNonNull(target, "Target unit cannot be null");
-            if (!Double.isFinite(value)) {
-                throw new IllegalArgumentException("Value must be a finite number");
-            }
-            return (value * source.conversionFactor) / target.conversionFactor;
+        public QuantityLength add(QuantityLength other) {
+            return add(other, this.unit);
         }
 
         /**
-         * Adds another measurement to this one and returns the result in this unit.
+         * Adds another measurement to this one and returns the result in the specified target unit.
+         * (UC7 Implementation)
          */
-        public QuantityLength add(QuantityLength other) {
-            Objects.requireNonNull(other, "Operand cannot be null");
-            double sumInBase = (this.value * this.unit.conversionFactor) + (other.value * other.unit.conversionFactor);
-            double finalValue = sumInBase / this.unit.conversionFactor;
-            return new QuantityLength(finalValue, this.unit);
+        public QuantityLength add(QuantityLength other, LengthUnit targetUnit) {
+            return performAddition(this, other, targetUnit);
         }
 
         /**
          * Static method to add two measurements and express the result in a target unit.
          */
         public static QuantityLength add(QuantityLength q1, QuantityLength q2, LengthUnit targetUnit) {
+            return performAddition(q1, q2, targetUnit);
+        }
+
+        /**
+         * Private utility method to centralize addition logic and avoid code duplication.
+         */
+        private static QuantityLength performAddition(QuantityLength q1, QuantityLength q2, LengthUnit targetUnit) {
             Objects.requireNonNull(q1, "First operand cannot be null");
             Objects.requireNonNull(q2, "Second operand cannot be null");
             Objects.requireNonNull(targetUnit, "Target unit cannot be null");
@@ -92,6 +93,7 @@ public class QuantityMeasurementApp {
             if (obj == null || getClass() != obj.getClass()) return false;
             QuantityLength that = (QuantityLength) obj;
             
+            // Consistent rounding to two decimal places for equality checks
             double v1 = Math.round(this.value * this.unit.conversionFactor * 100.0) / 100.0;
             double v2 = Math.round(that.value * that.unit.conversionFactor * 100.0) / 100.0;
             
@@ -114,26 +116,21 @@ public class QuantityMeasurementApp {
 
     // --- API Demonstration Methods ---
 
-    public static void demonstrateLengthAddition(QuantityLength q1, QuantityLength q2) {
-        QuantityLength result = q1.add(q2);
+    public static void demonstrateLengthAddition(QuantityLength q1, QuantityLength q2, LengthUnit target) {
+        QuantityLength result = q1.add(q2, target);
         System.out.printf("Addition: %s + %s -> Result: %s\n", q1, q2, result);
     }
 
-    public static void demonstrateLengthAddition(QuantityLength q1, QuantityLength q2, LengthUnit target) {
-        QuantityLength result = QuantityLength.add(q1, q2, target);
-        System.out.printf("Addition: %s + %s (Target %s) -> Result: %s\n", q1, q2, target, result);
-    }
-
     public static void main(String[] args) {
-        // Same Unit Addition
-        demonstrateLengthAddition(new QuantityLength(1.0, LengthUnit.FEET), new QuantityLength(2.0, LengthUnit.FEET));
+        // UC7 Demonstration
+        QuantityLength feet1 = new QuantityLength(1.0, LengthUnit.FEET);
+        QuantityLength inches12 = new QuantityLength(12.0, LengthUnit.INCH);
 
-        // Cross Unit Addition
-        demonstrateLengthAddition(new QuantityLength(1.0, LengthUnit.FEET), new QuantityLength(12.0, LengthUnit.INCH));
-        demonstrateLengthAddition(new QuantityLength(12.0, LengthUnit.INCH), new QuantityLength(1.0, LengthUnit.FEET));
+        demonstrateLengthAddition(feet1, inches12, LengthUnit.FEET);   // Result in FEET
+        demonstrateLengthAddition(feet1, inches12, LengthUnit.INCH);   // Result in INCH
+        demonstrateLengthAddition(feet1, inches12, LengthUnit.YARD);   // Result in YARD
         
-        // Yard and CM Addition
-        demonstrateLengthAddition(new QuantityLength(1.0, LengthUnit.YARD), new QuantityLength(3.0, LengthUnit.FEET));
-        demonstrateLengthAddition(new QuantityLength(2.54, LengthUnit.CM), new QuantityLength(1.0, LengthUnit.INCH));
+        // CM Example
+        demonstrateLengthAddition(new QuantityLength(2.54, LengthUnit.CM), new QuantityLength(1.0, LengthUnit.INCH), LengthUnit.CM);
     }
 }
